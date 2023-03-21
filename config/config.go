@@ -3,49 +3,48 @@
 package config
 
 import (
-	"database/sql"
-	"fmt"
 	"log"
+	"os"
+	"strconv"
 
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 )
 
 type DatabaseConfig struct{
 	Host			string
-	Port			string
+	Port			int
 	Username 	string
 	Password 	string
-	DBName 		string
+	Name 			string
 }
 
-func InitDatabase() (*sql.DB, error) {
-	databaseConfig := DatabaseConfig {
-		Host: "localhost",
-		Port: "3306",
-		Username: "root",
-		Password: "@Pilotjhon18",
-		DBName: "mydb",
-	}
-	
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", 
-		databaseConfig.Username, 
-		databaseConfig.Password, 
-		databaseConfig.Host, 
-		databaseConfig.Port, 
-		databaseConfig.DBName))
+func InitDatabase() *DatabaseConfig {
+	res := readConfig()
 
+	if res == nil {
+		log.Fatal("error connecting to database")
+	}
+
+	return res
+}
+
+func readConfig() *DatabaseConfig {
+	err := godotenv.Load(".env")
+	res := DatabaseConfig{}
 	if err != nil {
-		log.Fatal("error connecting to database: ", err)
-		return nil, err
+		log.Println("Tidak bisa baca konfigurasi")
+		return nil
 	}
-	//test database connection
-	err = db.Ping()
+	res.Username = os.Getenv("Username")
+	res.Password = os.Getenv("Password")
+	res.Host = os.Getenv("Host")
+	cnv, err := strconv.Atoi(os.Getenv("Port"))
 	if err != nil {
-		log.Fatal(err)
-		return nil, err
+		log.Println("Nilai port tidak valid")
+		return nil
 	}
+	res.Port = cnv
+	res.Name = os.Getenv("Name")
 
-	// fmt.Println("Database connection established")
-
-	return db, nil
+	return &res
 }
