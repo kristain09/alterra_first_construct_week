@@ -1,59 +1,22 @@
 package config
 
 import (
-	"context"
 	"database/sql"
-	"fmt"
 	"testing"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func TestExecSql(t *testing.T) {
-	databaseConfig := InitDatabase()
-	db := GetConnection(*databaseConfig)
+func TestOpenConnection(t *testing.T) {
+	db, err := sql.Open("mysql", "root:pilotjhon18@tcp(localhost:3306)/mydb")
+	if err != nil {
+		t.Fatalf("Error opening database connection: %s", err.Error())
+	}
 	defer db.Close()
 
-	ctx := context.Background()
-
-	query := "INSERT INTO products (name, price, stock, deleted_at, created_by) VALUES ('Cap Panda', '100000', '100','2022-12-31 23:59:59', '1');"
-	_, err := db.ExecContext(ctx, query)
+	err = db.Ping()
 	if err != nil {
-		panic(err)
+		t.Fatalf("Error pinging database: %s", err.Error())
 	}
-	fmt.Println("Success insert new product")
 }
 
-func TestQuerySql(t *testing.T) {
-	databaseConfig := InitDatabase()
-	db := GetConnection(*databaseConfig)
-	defer db.Close()
-
-	ctx := context.Background()
-
-	query := "SELECT id, name, price, stock, deleted_at, created_by FROM products"
-	rows, err := db.QueryContext(ctx, query)
-	if err != nil {
-		panic(err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var id, price, stock, created_by int
-		var name string
-		var deleted_at sql.NullTime
-		err := rows.Scan(&id, &name, &price, &stock, &deleted_at, &created_by)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println("=====================================")
-		fmt.Println("Id:", id)
-		fmt.Println("Name:", name)
-		fmt.Println("Price:", price)
-		fmt.Println("Stock:", stock)
-		if deleted_at.Valid {
-			fmt.Println("Deleted_at:", deleted_at.Time)
-		}
-		fmt.Println("Created_at", created_by)
-	}
-}
