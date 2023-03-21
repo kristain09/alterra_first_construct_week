@@ -1,6 +1,8 @@
 package products
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 type Products struct {
 	ID         int
@@ -9,4 +11,5 @@ type Products struct {
 	Stock      int
 	Deleted_at sql.NullTime
 	Created_by int
+	Updated_at string
 }

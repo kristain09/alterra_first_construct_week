@@ -8,22 +8,22 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func GetConnection(databaseConfig DatabaseConfig) *sql.DB {
+func GetConnection(config DatabaseConfig) (*sql.DB, error) {
 	dataSource := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s",
-		databaseConfig.Username,
-		databaseConfig.Password,
-		databaseConfig.Host,
-		databaseConfig.Port,
-		databaseConfig.Name)
+		config.Username,
+		config.Password,
+		config.Host,
+		config.Port,
+		config.Name)
 	db, err := sql.Open("mysql", dataSource)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	db.SetMaxIdleConns(5)
-	db.SetMaxIdleConns(50)
-	db.SetConnMaxIdleTime(5 *time.Minute)
-	db.SetConnMaxLifetime(60 *time.Minute)
+	db.SetMaxOpenConns(50)
+	db.SetConnMaxIdleTime(5 * time.Minute)
+	db.SetConnMaxLifetime(60 * time.Minute)
 
-	return db
+	return db, nil
 }

@@ -1,6 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"first_construct_week/config"
+	"first_construct_week/products"
+	"fmt"
+	"log"
+)
 
 func main() {
 	
@@ -10,16 +15,17 @@ func main() {
 	var password string
 	var choice2 int
 	//db
-	fmt.Scanln()
+	// fmt.Scanln()
 	for running {
 		fmt.Println("Welcome to our project!\nwhat do you want to do?")
 		fmt.Println("1. Login")
-		fmt.Println("99. Exit")
+		fmt.Println("9. Exit")
+		fmt.Print("Input menu : ")
 		fmt.Scan(&choice)
 		switch choice {
 		case 1:
-			fmt.Print("Please enter your username!")
-			fmt.Scanln(&username)
+			fmt.Println("Please enter your username!")
+			fmt.Scan(&username)
 			fmt.Println("Please enter your password!")
 			fmt.Scan(&password)
 			// function login
@@ -31,36 +37,40 @@ func main() {
 		case 99:
 			running = false
 		default:
-			fmt.Println("incorrect input!\nPlease try again!")
+			fmt.Println("Incorrect input, Please try again!")
 			continue
 		}
-		logIn := true
-		for logIn {
-			menu1 := `
-1. Product Information
-2. Transaction Input
-3. Transaction History
-4. Register Cashier
-9. Logout
-99. Exit`
-			fmt.Println(menu1)
+		login := true
+		for login {
+			fmt.Println("========================")
+			fmt.Println("Hi <username>, input menu :")
+			fmt.Println("========================")
+			conn := config.InitDatabase()
+			db, err := config.GetConnection(*conn)
+			if err != nil {
+				log.Panic(err)
+			}
+				defer db.Close()
+
+			fmt.Println("1. Product Information")
+			fmt.Println("2. Transaction Input")
+			fmt.Println("3. Transaction History")
+			fmt.Println("4. Register Cashier")
+			fmt.Println("9. Logout")
+			fmt.Print("Input menu : ")
 			fmt.Scan(&choice2)
 			switch choice2 {
 			case 1:
-				// method atau function barang
-				// query hanya di model query exec
-				// function/method ada di entities
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-
+				cfg := config.InitDatabase()
+				conn, _ := config.GetConnection(*cfg)
+				pm := products.ProductModel{}
+				pm.SetConnection(conn)
+				pc := products.NewProductController(&pm)
+				if conn == nil {
+					log.Fatalln("Ga connected")
+				}
+				pc.HandleRequest()
+			
 			case 2:
 				// method atau function transaksi
 				//
@@ -105,7 +115,7 @@ func main() {
 				//
 				//
 			case 9:
-				logIn = false
+				login = false
 			case 99:
 				running = false
 			default:
