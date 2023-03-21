@@ -1,28 +1,45 @@
 package main
 
-import "fmt"
+import (
+	"first_construct_week/config"
+	"first_construct_week/users"
+	"fmt"
+	"log"
+)
 
 func main() {
 
 	running := true
-	var choice int
-	var username string
-	var password string
-	var choice2 int
-	//db
-	fmt.Scanln()
+	var (
+		choice  int
+		choice2 int
+		mdl     users.UsersModels
+		ctr     users.UsersController
+	)
+
+	cfg := config.InitConfig()
+	connection := config.ConnectSql(*cfg)
+	defer connection.Close()
+
+	if connection == nil {
+		log.Fatal("error to connect to database")
+	}
+
+	mdl.SetConnUsersModels(connection)
+	ctr.SetConnectModels(mdl)
 	for running {
 		fmt.Println("Welcome to our project!\nwhat do you want to do?")
 		fmt.Println("1. Login")
 		fmt.Println("99. Exit")
-		fmt.Scan(&choice)
+		fmt.Scanln(&choice)
 		switch choice {
 		case 1:
-			fmt.Print("Please enter your username!")
-			fmt.Scanln(&username)
-			fmt.Println("Please enter your password!")
-			fmt.Scan(&password)
-			// function login
+			user, err := ctr.Login()
+			if err != nil {
+				log.Print(err)
+				continue
+			
+			fmt.Println(user)
 			//
 			//
 			//
@@ -114,17 +131,4 @@ func main() {
 			}
 		}
 	}
-}
-
-//product :
-//product has transaction jadi 1
-
-// user: admin
-//login dan autentifikasi admin!
-// user sama customer
-
-// transaction bagi 2 di akhir
-
-func inputtransaksi() {
-
 }
