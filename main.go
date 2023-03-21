@@ -33,7 +33,8 @@ func main() {
 		fmt.Println("Welcome to our project!\nwhat do you want to do?")
 		fmt.Println("1. Login")
 		fmt.Println("99. Exit")
-		fmt.Scanln(&choice)
+		fmt.Print("Input menu : ")
+		fmt.Scan(&choice)
 		switch choice {
 		case 1:
 			result, err := ctr.Login()
@@ -80,10 +81,10 @@ func main() {
 				pm.SetConnection(conn)
 				pc := products.NewProductController(&pm)
 				if conn == nil {
-					log.Fatalln("Ga connected")
+					log.Fatalln(" connected")
 				}
 				pc.HandleRequest()
-			
+
 			case 2:
 				// method atau function transaksi
 				//

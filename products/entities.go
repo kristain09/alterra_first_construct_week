@@ -12,4 +12,5 @@ type Products struct {
 	Deleted_at sql.NullTime
 	Created_by int
 	Updated_at string
+	Username   string
 }
