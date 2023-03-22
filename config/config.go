@@ -1,49 +1,45 @@
 package config
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"strconv"
 
 	"github.com/joho/godotenv"
 )
 
-type DatabaseConfig struct {
-	Host     string
-	Port     int
-	Username string
-	Password string
-	Name     string
+type appConfig struct {
+	DBHost     string
+	DBPort     int
+	DBName     string
+	DBUserName string
+	dbPassword string
 }
 
-func InitDatabase() *DatabaseConfig {
-	res := readConfig()
-
-	if res == nil {
-		panic("error connecting to database")
-	}
-
-	return res
-}
-
-func readConfig() *DatabaseConfig {
+func readConfig() *appConfig {
 	err := godotenv.Load(".env")
+	result := appConfig{}
+
 	if err != nil {
-		fmt.Println("Tidak bisa baca konfigurasi")
-		return nil
+		log.Print("failed to load env files")
 	}
 
-	port, err := strconv.Atoi(os.Getenv("Port"))
+	result.DBHost = os.Getenv("DBHost")
+	result.DBName = os.Getenv("DBName")
+	result.dbPassword = os.Getenv("DBPassword")
+	result.DBPort, err = strconv.Atoi(os.Getenv("DBPort"))
 	if err != nil {
-		fmt.Println("Nilai port tidak valid")
+		log.Println("Error from converting DBPort")
+	}
+	result.DBUserName = os.Getenv("DBUserName")
+	return &result
+}
+
+func InitConfig() *appConfig {
+	result := readConfig()
+	if result == nil {
 		return nil
 	}
+	return result
 
-	return &DatabaseConfig{
-		Host:     os.Getenv("Host"),
-		Port:     port,
-		Username: os.Getenv("Username"),
-		Password: os.Getenv("Password"),
-		Name:     os.Getenv("Name"),
-	}
 }
