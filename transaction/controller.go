@@ -6,7 +6,7 @@ type TransactionsController struct {
 	TransactionsModels TransactionsModels
 }
 
-func (tc *TransactionsController) SetConnectTrModels(tm TransactionsModels) {
+func (tc *TransactionsController) SetConnTcTrModels(tm TransactionsModels) {
 	tc.TransactionsModels = tm
 }
 

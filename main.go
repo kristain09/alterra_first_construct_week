@@ -68,13 +68,13 @@ func main() {
 				case 2:
 					//  Transaction Input functionality
 				case 3:
-					// template m // Update Transaction History functionality
+					// Update Transaction History functionality
 				case 4:
-					// template m//Delete Transaction functionality
+					// template m c//Delete Transaction functionality
 				case 5:
-					// template m// All Transaction History functionality
+					// template m c// All Transaction History functionality
 				case 6:
-					// template m// Transaction By ID
+					// template m c// Transaction By ID
 				case 7:
 					//done // Register Cashier functionality
 					uc.Register()
@@ -102,7 +102,7 @@ func main() {
 				case 2:
 					// Transaction Input functionality
 				case 3:
-					// template m// Transaction History functionality
+					// template m c// Transaction History functionality
 				case 9:
 					LoggedIn = false
 				case 99:
