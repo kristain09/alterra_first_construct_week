@@ -48,12 +48,6 @@ func main() {
 				continue
 			}
 
-			fmt.Println("Please enter your username!")
-			fmt.Scan(&username)
-			fmt.Println("Please enter your password!")
-			fmt.Scan(&password)
-			// function login
-			//
 			//
 			//
 			//
@@ -91,36 +85,6 @@ func main() {
 			//
 			//
 			//
-		login := true
-		for login {
-			fmt.Println("========================")
-			fmt.Println("Hi <username>, input menu :")
-			fmt.Println("========================")
-			conn := config.InitDatabase()
-			db, err := config.GetConnection(*conn)
-			if err != nil {
-				log.Panic(err)
-			}
-				defer db.Close()
-
-			fmt.Println("1. Product Information")
-			fmt.Println("2. Transaction Input")
-			fmt.Println("3. Transaction History")
-			fmt.Println("4. Register Cashier")
-			fmt.Println("9. Logout")
-			fmt.Print("Input menu : ")
-			fmt.Scan(&choice2)
-			switch choice2 {
-			case 1:
-				cfg := config.InitDatabase()
-				conn, _ := config.GetConnection(*cfg)
-				pm := products.ProductModel{}
-				pm.SetConnection(conn)
-				pc := products.NewProductController(&pm)
-				if conn == nil {
-					log.Fatalln(" connected")
-				}
-				pc.HandleRequest()
 
 		case 2:
 			// method atau function transaksi
