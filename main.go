@@ -15,6 +15,7 @@ func main() {
 		choice2 int
 		mdl     users.UsersModels
 		ctr     users.UsersController
+		auth    users.Users
 	)
 
 	cfg := config.InitConfig()
@@ -34,13 +35,13 @@ func main() {
 		fmt.Scanln(&choice)
 		switch choice {
 		case 1:
-			user, err := ctr.Login()
+			result, err := ctr.Login()
+			auth = *result
 			if err != nil {
 				log.Print(err)
 				continue
-			
-			fmt.Println(user)
-			//
+			}
+
 			//
 			//
 			//
@@ -51,84 +52,87 @@ func main() {
 			fmt.Println("incorrect input!\nPlease try again!")
 			continue
 		}
-		logIn := true
-		for logIn {
-			menu1 := `
+	}
+	logIn := true
+	for logIn {
+		menu1 := `
 1. Product Information
 2. Transaction Input
 3. Transaction History
 4. Register Cashier
 9. Logout
 99. Exit`
-			fmt.Println(menu1)
-			fmt.Scan(&choice2)
-			switch choice2 {
-			case 1:
-				// method atau function barang
-				// query hanya di model query exec
-				// function/method ada di entities
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
+		fmt.Println(menu1)
+		fmt.Scan(&choice2)
+		switch choice2 {
+		case 1:
+			// method atau function barang
+			// query hanya di model query exec
+			// function/method ada di entities
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
 
-			case 2:
-				// method atau function transaksi
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
+		case 2:
+			// method atau function transaksi
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
 
-			case 3:
-				// method atau function rekap penjualan
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-			case 4:
-				// method atau function register kasir
-				// if branching first!
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-			case 9:
-				logIn = false
-			case 99:
-				running = false
-			default:
-				fmt.Println("anda memasukkan input yang salah!")
-				continue
+		case 3:
+			// method atau function rekap penjualan
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+		case 4:
+			if auth.UserName == "admin" {
+
+			} else {
+				fmt.Println("Acces denied! Please call admin!")
 			}
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+		case 9:
+			logIn = false
+		case 99:
+			running = false
+		default:
+			fmt.Println("anda memasukkan input yang salah!")
+			continue
 		}
 	}
 }
