@@ -2,14 +2,31 @@ package main
 
 import (
 	"first_construct_week/config"
-	"first_construct_week/products"
 	"fmt"
 	"log"
 )
 
 func main() {
-	
+
 	running := true
+	var (
+		choice  int
+		choice2 int
+		mdl     users.UsersModels
+		ctr     users.UsersController
+		auth    users.Users
+	)
+
+	cfg := config.InitConfig()
+	connection := config.ConnectSql(*cfg)
+	defer connection.Close()
+
+	if connection == nil {
+		log.Fatal("error to connect to database")
+	}
+
+	mdl.SetConnUsersModels(connection)
+	ctr.SetConnectModels(mdl)
 	var choice int
 	var username string
 	var password string
@@ -24,6 +41,13 @@ func main() {
 		fmt.Scan(&choice)
 		switch choice {
 		case 1:
+			result, err := ctr.Login()
+			auth = *result
+			if err != nil {
+				log.Print(err)
+				continue
+			}
+
 			fmt.Println("Please enter your username!")
 			fmt.Scan(&username)
 			fmt.Println("Please enter your password!")
@@ -40,6 +64,33 @@ func main() {
 			fmt.Println("Incorrect input, Please try again!")
 			continue
 		}
+	}
+	logIn := true
+	for logIn {
+		menu1 := `
+1. Product Information
+2. Transaction Input
+3. Transaction History
+4. Register Cashier
+9. Logout
+99. Exit`
+		fmt.Println(menu1)
+		fmt.Scan(&choice2)
+		switch choice2 {
+		case 1:
+			// method atau function barang
+			// query hanya di model query exec
+			// function/method ada di entities
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
 		login := true
 		for login {
 			fmt.Println("========================")
@@ -71,57 +122,59 @@ func main() {
 				}
 				pc.HandleRequest()
 
-			case 2:
-				// method atau function transaksi
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
+		case 2:
+			// method atau function transaksi
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
 
-			case 3:
-				// method atau function rekap penjualan
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-			case 4:
-				// method atau function register kasir
-				// if branching first!
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-			case 9:
-				login = false
-			case 99:
-				running = false
-			default:
-				fmt.Println("anda memasukkan input yang salah!")
-				continue
+		case 3:
+			// method atau function rekap penjualan
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+		case 4:
+			if auth.UserName == "admin" {
+
+			} else {
+				fmt.Println("Acces denied! Please call admin!")
 			}
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+			//
+		case 9:
+			logIn = false
+		case 99:
+			running = false
+		default:
+			fmt.Println("anda memasukkan input yang salah!")
+			continue
 		}
 	}
 }
