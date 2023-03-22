@@ -13,7 +13,7 @@ type TransactionsModels struct {
 	conn *sql.DB
 }
 
-func (tm *TransactionsModels) SetConnTransModels(db *sql.DB) {
+func (tm *TransactionsModels) SetConnDBTransModels(db *sql.DB) {
 	tm.conn = db
 }
 

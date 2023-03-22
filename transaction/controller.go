@@ -1,6 +1,8 @@
 package transaction
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type TransactionsController struct {
 	TransactionsModels TransactionsModels
@@ -23,4 +25,23 @@ func (tc TransactionsController) DeleteTransaction() {
 	fmt.Println("Please enter transaction id!")
 	fmt.Scanln(&id)
 	tc.TransactionsModels.InitDeletedAt(id)
+}
+
+func (tc *TransactionsController) CreateTransaction(id int) { // id login
+	var choice int
+	fmt.Println("1. New Customer")
+	fmt.Println("2. Existing Customer")
+	fmt.Scanln(&choice)
+
+	switch choice {
+	case 1:
+		//call RegisterCustomer customer package!
+		fallthrough
+	case 2:
+		// input transaction
+		fmt.Println("Please input ")
+	default:
+		fmt.Println("Not valid operation")
+		return
+	}
 }
