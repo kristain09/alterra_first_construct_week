@@ -4,12 +4,13 @@ import (
 	"first_construct_week/config"
 	"first_construct_week/users"
 	"first_construct_week/products"
+	"first_construct_week/transactions"
 	"fmt"
 	"log"
 )
 
 func main() {
-	
+
 	running := true
 	var (
 		choice  int
@@ -64,7 +65,7 @@ func main() {
 			if err != nil {
 				log.Panic(err)
 			}
-				defer db.Close()
+			defer db.Close()
 
 			fmt.Println("1. Product Information")
 			fmt.Println("2. Transaction Input")
@@ -86,19 +87,15 @@ func main() {
 				pc.HandleRequest()
 
 			case 2:
-				// method atau function transaksi
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
+				cfg := config.InitDatabase()
+				conn, _ := config.GetConnection(*cfg)
+				tm := transactions.TransactionsModel{}
+				tm.SetConnection(conn)
+				tc := transactions.NewTransactionController(&tm)
+				if conn == nil {
+					log.Fatalln(" connected")
+				}
+				tc.HandleRequest()
 
 			case 3:
 				// method atau function rekap penjualan
