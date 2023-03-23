@@ -1,6 +1,9 @@
 package transaction
 
-import "time"
+import (
+	"first_construct_week/products"
+	"time"
+)
 
 type Transactions struct {
 	ID          int
@@ -9,4 +12,5 @@ type Transactions struct {
 	Total       int
 	CustomersID int
 	CreatedBy   int
+	Product     []products.Products
 }

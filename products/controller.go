@@ -19,34 +19,34 @@ func NewProductController(pm *ProductModel) *ProductController {
 }
 
 func (pc *ProductController) HandleRequest() {
-	
+
 	var choice int
-	
+
 	for {
 		now := time.Now()
-    fmt.Println(" Product Information\n", now.Format("Monday, 2006 January 2 15:04:05"))
+		fmt.Println(" Product Information\n", now.Format("Monday, 2006 January 2 15:04:05"))
 		pc.handleListProduct() // menggunakan lastest update_at
 		fmt.Println("1. Create Product")
 		fmt.Println("2. Update Product Name")
 		fmt.Println("3. Update Product Price")
 		fmt.Println("4. Update Stock")
 		fmt.Println("5. Delete Product") // -- soft delete product --
-		fmt.Println("9. Exit")					 // -- read product by stock availability and delete at is not null untuk keperluan transaksi--
+		fmt.Println("9. Exit")           // -- read product by stock availability and delete at is not null untuk keperluan transaksi--
 		fmt.Print("Enter choice: ")
-		fmt.Scan(&choice)								 // -- read product by id -- sku untuk dapat akses nama etc and delete at is null --
+		fmt.Scan(&choice) // -- read product by id -- sku untuk dapat akses nama etc and delete at is null --
 
 		switch choice {
 		case 1:
 			pc.handleCreateProduct()
 		case 2:
-			
+
 		case 3:
 
 		case 4:
 
-		case 5:	
-	
-		case 9:	
+		case 5:
+
+		case 9:
 			fmt.Println("Exiting program...")
 			return
 		default:
@@ -70,7 +70,7 @@ func (pc *ProductController) handleListProduct() {
 
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"ID", "Name", "Price", "Stock", "Username", "Latest Update"})
-	
+
 	for _, p := range products {
 		table.Append([]string{fmt.Sprint(p.ID), p.Name, fmt.Sprintf("%d", p.Price), fmt.Sprintf("%d", p.Stock), p.Username, p.Updated_at})
 	}
@@ -97,7 +97,6 @@ func (pc *ProductController) handleCreateProduct() {
 		}
 		fmt.Println("Name cannot be empty")
 	}
-	
 
 	fmt.Print("Enter product price: ")
 	fmt.Scan(&price)
@@ -115,6 +114,6 @@ func (pc *ProductController) handleCreateProduct() {
 	}
 
 	fmt.Println("---------------------------")
-	fmt.Printf("Product created successfully with details:\nID\t: %d\nName\t: %s\nPrice\t: %d\nStock\t: %d\nCreated by\t: %d\nUpdated at\t: %s\n", product.ID, product.Name, product.Price, product.Stock, product.Created_by,product.Updated_at)
+	fmt.Printf("Product created successfully with details:\nID\t: %d\nName\t: %s\nPrice\t: %d\nStock\t: %d\nCreated by\t: %d\nUpdated at\t: %s\n", product.ID, product.Name, product.Price, product.Stock, product.Created_by, product.Updated_at)
 	fmt.Println("---------------------------")
 }

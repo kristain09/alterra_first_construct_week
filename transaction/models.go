@@ -2,11 +2,6 @@ package transaction
 
 import (
 	"database/sql"
-	"fmt"
-	"os"
-	"strconv"
-
-	"github.com/olekukonko/tablewriter"
 )
 
 type TransactionsModels struct {
@@ -17,58 +12,39 @@ func (tm *TransactionsModels) SetConnDBTransModels(db *sql.DB) {
 	tm.conn = db
 }
 
-func (tm TransactionsModels) PrintAllTransData() error {
+func (tm TransactionsModels) GetAllTransData() ([]Transactions, error) {
 	var transactions []Transactions
 
 	query := "SELECT id, invoice, transdate, total, customers_id, created_by FROM transactions WHERE deleted_at IS NULL"
 	rows, err := tm.conn.Query(query)
 	if err != nil {
-		return err
+		return transactions, err
 	}
 	defer rows.Close()
 
 	for rows.Next() {
 		var transaction Transactions
 		err := rows.Scan(&transaction.ID, &transaction.Invoice, &transaction.TransDate, &transaction.Total, &transaction.CustomersID, &transaction.CreatedBy)
-
 		if err != nil {
-			return err
+			return transactions, err
 		}
 
 		transactions = append(transactions, transaction)
 	}
 	if err = rows.Err(); err != nil {
-		return err
+		return transactions, err
 	}
 
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"ID", "Invoice", "Transdate", "Total", "Customers ID", "Created By"})
-
-	for _, transaction := range transactions {
-		row := []string{
-			strconv.Itoa(transaction.ID),
-			strconv.Itoa(transaction.Invoice),
-			transaction.TransDate.Format("2006-01-02 15:04:05"),
-			fmt.Sprintf("%d", transaction.Total),
-			strconv.Itoa(transaction.CustomersID),
-			strconv.Itoa(transaction.CreatedBy),
-			"-",
-		}
-		table.Append(row)
-	}
-
-	table.Render()
-
-	return nil
+	return transactions, nil
 }
 
-func (tm TransactionsModels) PrintTransDataByUserID(id int) error {
+func (tm TransactionsModels) GetAllTransDataByID(id int) ([]Transactions, error) {
 	var transactions []Transactions
 
 	query := "SELECT id, invoice, transdate, total, customers_id, created_by, deleted_at FROM transactions WHERE created_by = ? AND deleted_at IS NULL"
 	rows, err := tm.conn.Query(query, id)
 	if err != nil {
-		return err
+		return transactions, err
 	}
 	defer rows.Close()
 
@@ -81,28 +57,10 @@ func (tm TransactionsModels) PrintTransDataByUserID(id int) error {
 		transactions = append(transactions, transaction)
 	}
 	if err = rows.Err(); err != nil {
-		return err
+		return transactions, err
 	}
 
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"ID", "Invoice", "Transdate", "Total", "Customers ID", "Created By", "Deleted At"})
-
-	for _, transaction := range transactions {
-		row := []string{
-			strconv.Itoa(transaction.ID),
-			strconv.Itoa(transaction.Invoice),
-			transaction.TransDate.Format("2006-01-02 15:04:05"),
-			fmt.Sprintf("%d", transaction.Total),
-			strconv.Itoa(transaction.CustomersID),
-			strconv.Itoa(transaction.CreatedBy),
-			"-",
-		}
-		table.Append(row)
-	}
-
-	table.Render()
-
-	return nil
+	return transactions, nil
 }
 
 func (tm *TransactionsModels) InitDeletedAt(id int) error {
@@ -113,4 +71,8 @@ func (tm *TransactionsModels) InitDeletedAt(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (tm *TransactionsModels) CreateTransaction(productID, customerID, userID int) error {
+
 }

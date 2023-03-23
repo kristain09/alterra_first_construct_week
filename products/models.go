@@ -19,9 +19,9 @@ func (pm *ProductModel) ListProduct(name string, price int, stock int, updatedAt
 	query := "SELECT products.id, products.name, products.price, products.stock, products.created_by, products.deleted_at, products.updated_at, users.id as user_id, users.username FROM products JOIN users ON products.created_by = users.id WHERE products.deleted_at IS NULL"
 
 	// args := []interface{}{}
-	
+
 	// bisa menerapkan filter var arguments menggunakan interface kosong dengan input dari users.
-	
+
 	rows, err := pm.conn.Query(query)
 	if err != nil {
 		return products, fmt.Errorf("error executing query: %w", err)
@@ -44,7 +44,6 @@ func (pm *ProductModel) ListProduct(name string, price int, stock int, updatedAt
 
 	return products, nil
 }
-
 
 func (pm *ProductModel) CreateProduct(name string, price int, stock int, createdBy int) (Products, error) {
 	query := "INSERT INTO products (name, price, stock, created_by) VALUES (?, ?, ?, ?)"
