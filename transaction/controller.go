@@ -128,8 +128,8 @@ func (tc *TransactionsController) CreateTransaction(id int) error { // id login
 			list.HandleListProduct()
 			fmt.Println("Enter product's id\nPress 0 To Exit")
 			fmt.Scanln(&productName.ID)
-
 			trInput.Product = append(trInput.Product, productName)
+
 			fmt.Println("Enter qty")
 			fmt.Scanln(&quantity)
 		}
