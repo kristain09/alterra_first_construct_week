@@ -2,146 +2,130 @@ package main
 
 import (
 	"first_construct_week/config"
-	"first_construct_week/users"
 	"first_construct_week/products"
-	"first_construct_week/transactions"
+	transaction "first_construct_week/transactions"
+	"first_construct_week/users"
 	"fmt"
 	"log"
 )
 
 func main() {
-
 	running := true
 	var (
 		choice  int
 		choice2 int
-		mdl     users.UsersModels
-		ctr     users.UsersController
+		um      users.UsersModels
+		uc      users.UsersController
 		auth    users.Users
+		pm      products.ProductModel
 	)
 
 	cfg := config.InitConfig()
-	connection := config.ConnectSql(*cfg)
+	connection, _ := config.GetConnection(*cfg)
 	defer connection.Close()
 
 	if connection == nil {
-		log.Fatal("error to connect to database")
+		log.Fatal("error connection to database")
 	}
 
-	mdl.SetConnUsersModels(connection)
-	ctr.SetConnectModels(mdl)
+	um.SetConnUsersModels(connection)
+	pm.SetConnection(connection)
+	uc.SetConnectModels(um)
+	pc := products.NewProductController(&pm)
+
 	for running {
-		fmt.Println("Welcome to our project!\nwhat do you want to do?")
+		fmt.Println("Welcome to our project!")
+		fmt.Println("what do you want to do")
 		fmt.Println("1. Login")
 		fmt.Println("99. Exit")
-		fmt.Print("Input menu : ")
-		fmt.Scan(&choice)
+		fmt.Scanln(&choice)
 		switch choice {
 		case 1:
-			result, err := ctr.Login()
+			result, err := uc.Login()
 			auth = *result
 			if err != nil {
 				log.Print(err)
 				continue
 			}
-
-			fmt.Println("Please enter your username!")
-			fmt.Scan(&username)
-			fmt.Println("Please enter your password!")
-			fmt.Scan(&password)
-			// function login
-			//
-			//
-			//
-			//
-
+			fmt.Printf("Halo %s, What can we do for you?\n", auth.UserName)
 		case 99:
 			running = false
 		default:
-			fmt.Println("Incorrect input, Please try again!")
+			fmt.Println("incorrect input!\nPlease try again!")
 			continue
 		}
-		login := true
-		for login {
-			fmt.Println("========================")
-			fmt.Println("Hi <username>, input menu :")
-			fmt.Println("========================")
-			conn := config.InitDatabase()
-			db, err := config.GetConnection(*conn)
-			if err != nil {
-				log.Panic(err)
+
+		LoggedIn := true
+
+		if auth.UserName == "admin" {
+			for LoggedIn {
+				menu := "1. Product Information\n2. Transaction Input\n3. Update Transaction\n4. Delete Transaction\n5. All Transaction History\n6. Register Cashier\n7. Delete Cashier\n9. Logout\n99. Exit\n"
+				fmt.Println(menu)
+				fmt.Scanln(&choice2)
+				switch choice2 {
+				case 1:
+					// Product Information functionality
+					pc.HandleRequest()
+				case 2:
+					//  Transaction Input functionality
+				case 3:
+					// Update Transaction History functionality
+				case 4:
+					// template m c//Delete Transaction functionality
+				case 5:
+					// template m c// All Transaction History functionality
+				case 6:
+					// template m c// Transaction By ID
+				case 7:
+					//done // Register Cashier functionality
+					uc.Register()
+				case 8:
+					//done // Delete Cashier functionality
+					uc.DeleteUser()
+				case 9:
+					LoggedIn = false
+				case 99:
+					LoggedIn = false
+					running = false
+				default:
+					fmt.Println("Incorrect input! Please try again!")
+				}
 			}
-			defer db.Close()
-
-			fmt.Println("1. Product Information")
-			fmt.Println("2. Transaction Input")
-			fmt.Println("3. Transaction History")
-			fmt.Println("4. Register Cashier")
-			fmt.Println("9. Logout")
-			fmt.Print("Input menu : ")
-			fmt.Scan(&choice2)
-			switch choice2 {
-			case 1:
-				cfg := config.InitDatabase()
-				conn, _ := config.GetConnection(*cfg)
-				pm := products.ProductModel{}
-				pm.SetConnection(conn)
-				pc := products.NewProductController(&pm)
-				if conn == nil {
-					log.Fatalln(" connected")
+		} else {
+			for LoggedIn {
+				menu := "1. Product Information\n2. Transaction Input\n3. Transaction History\n9. Logout\n99. Exit\n"
+				fmt.Println(menu)
+				fmt.Scanln(&choice2)
+				switch choice2 {
+				case 1:
+					// Product Information functionality
+					pm := products.ProductModel{}
+					pm.SetConnection(connection)
+					pc := products.NewProductController(&pm)
+					if connection == nil {
+						log.Fatalln(" connected")
+					}
+					pc.HandleRequest()
+				case 2:
+					// Transaction Input functionality
+					tm := transaction.TransactionsModels{}
+					tm.SetConnDBTransModels(connection)
+					tc := transaction.NewTransactionController(&tm)
+					if connection == nil {
+						log.Fatalln(" connected")
+					}
+					tc.HandleRequest()
+				case 3:
+					// template m c// Transaction History functionality
+				case 9:
+					LoggedIn = false
+				case 99:
+					LoggedIn = false
+					running = false
+				default:
+					fmt.Println("Incorrect input! Please try again!")
 				}
-				pc.HandleRequest()
-
-			case 2:
-				cfg := config.InitDatabase()
-				conn, _ := config.GetConnection(*cfg)
-				tm := transactions.TransactionsModel{}
-				tm.SetConnection(conn)
-				tc := transactions.NewTransactionController(&tm)
-				if conn == nil {
-					log.Fatalln(" connected")
-				}
-				tc.HandleRequest()
-
-			case 3:
-				// method atau function rekap penjualan
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-			case 4:
-				if auth.UserName == "admin" {
-	
-				} else {
-					fmt.Println("Acces denied! Please call admin!")
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-				//
-			case 9:
-				login = false
-			case 99:
-				running = false
-			default:
-				fmt.Println("anda memasukkan input yang salah!")
-				continue
 			}
 		}
 	}
-}
 }

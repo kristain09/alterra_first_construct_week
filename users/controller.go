@@ -12,14 +12,14 @@ func (uc *UsersController) SetConnectModels(um UsersModels) {
 	uc.UsersModels = um
 }
 
-func (uc UsersController) Login() (user *Users, err error) {
+func (uc UsersController) Login() (*Users, error) {
 	var (
 		id       int
 		password string
 	)
 
 	fmt.Println("Input your id!")
-	_, err = fmt.Scanln(&id)
+	_, err := fmt.Scanln(&id)
 	if err != nil {
 		return &Users{}, err
 	}
@@ -30,12 +30,12 @@ func (uc UsersController) Login() (user *Users, err error) {
 		return &Users{}, err
 	}
 
-	user, err = uc.UsersModels.GetUserByID(id, password)
+	user, err := uc.UsersModels.GetUserByID(id, password)
 	if err != nil {
 		return &Users{}, err
 	}
 
-	return
+	return user, nil
 }
 
 func (uc *UsersController) Register() error {

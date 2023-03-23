@@ -13,19 +13,19 @@ func (um *UsersModels) SetConnUsersModels(db *sql.DB) {
 	um.conn = db
 }
 
-func (um UsersModels) GetUserByID(id int, password string) (result *Users, err error) {
-	result = &Users{}
+func (um UsersModels) GetUserByID(id int, password string) (*Users, error) {
+	result := Users{}
 	resultQuery := um.conn.QueryRow("SELECT id, username FROM users WHERE id = ? AND password = ? AND deleted_at IS NULL", id, password)
 	if resultQuery.Err() != nil {
 		log.Println("Look up data error", resultQuery.Err().Error())
 		return nil, resultQuery.Err()
 	}
-	err = resultQuery.Scan(&result.ID, &result.UserName)
+	err := resultQuery.Scan(&result.ID, &result.UserName)
 	if err != nil {
 		log.Println("Scan result error", err.Error())
 		return nil, err
 	}
-	return result, nil
+	return &result, nil
 }
 
 func (um *UsersModels) InsertDataToUsers(newUser Users) error {

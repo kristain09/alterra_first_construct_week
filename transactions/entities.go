@@ -1,12 +1,16 @@
 package transactions
 
+import (
+	"first_construct_week/products"
+	"time"
+)
+
 type Transactions struct {
 	ID          int
-	Invoice     string
-	Transdate   string
-	Quantity    int
+	Invoice     int
+	TransDate   time.Time
 	Total       int
-	ProductID   int
 	CustomersID int
 	CreatedBy   int
+	Product     []products.Products
 }

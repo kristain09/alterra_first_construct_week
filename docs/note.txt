@@ -1,0 +1,14 @@
+Transakfa-spin
+
+1. buat input untuk masukin ID customer.
+2. kalau yang masuk ID tinggal masuk. 
+3. setelah input ID customer, selanjutnya ID Produk dan quantity
+4. tampilan daftar produk disaat melakukan transaksi
+5. Subtotal sumTotal di golang input ID product dan quatity, price.
+6. user bisa inputkan ID product looping hingga stop.
+7. kapan masuk database, setelah produk dan quantity distop looping. insert bd.
+8. input transaksi, lookup ke product has transaksi, dari 
+ daftar harga didapat dari produk dan ..
+ simpan dalam array
+ looping dalam control 
+ etc.
