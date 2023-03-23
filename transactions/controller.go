@@ -56,7 +56,7 @@ func (tc *TransactionsController) HandleRequest() {
 			cfg := config.InitConfig()
 			connection, _ := config.GetConnection(*cfg)
 			now := time.Now()
-			fmt.Println(" Product Information\n", now.Format("Monday, 2006 January 2 15:04:05"))
+			fmt.Println(" Transaction Information\n", now.Format("Monday, 2006 January 2 15:04:05"))
 			pm := products.ProductModel{}
 			pm.SetConnection(connection)
 			pc := products.NewProductController(&pm)
@@ -64,7 +64,7 @@ func (tc *TransactionsController) HandleRequest() {
 				log.Fatalln(" connected")
 			}
 			pc.HandleListProduct()
-			tc.CreateTransaction
+			tc.CreateTransaction()
 		case 4:
 			return
 		default:
@@ -125,52 +125,73 @@ func (tc TransactionsController) TransactionHistoryByID(id int) error {
 	return nil
 }
 
-func (tc *TransactionsController) CreateTransaction(id int) error { // id login
-	var choice int
-	fmt.Println("1. New Customer")
-	fmt.Println("2. Existing Customer")
-	fmt.Scanln(&choice)
+func (tc TransactionsController) DeleteTransaction() {
+	var id int
+	fmt.Println("Please enter transaction id!")
+	fmt.Scanln(&id)
+	tc.TransactionsModels.InitDeletedAt(id)
+}
 
-	switch choice {
-	case 1:
-		//call RegisterCustomer customer package!
-		var custConn TransactionsController
-		cust_id, err := custConn.TrCustModels.RegisterCustomer(id)
+func (tc *TransactionsController) CreateTransaction() {
+	var productID, customersID, createdBy, quantity, total int
+
+	log.Println("---------------------------")
+	log.Println("Create Transaction")
+	log.Println("---------------------------")
+
+	for {
+		fmt.Print("Add another product? (y/n): ")
+		var choice string
+		if _, err := fmt.Scan(&choice); err != nil {
+			fmt.Println("Invalid input, please try again.")
+			continue
+		}
+		if choice == "n" {
+			break
+		}
+
+		fmt.Print("Enter product ID: ")
+		if _, err := fmt.Scan(&productID); err != nil {
+			log.Println("Invalid input, please try again.")
+			continue
+		}
+
+		fmt.Print("Enter quantity: ")
+		if _, err := fmt.Scan(&quantity); err != nil {
+			fmt.Println("Invalid input, please try again.")
+			continue
+
+			fmt.Print("Enter total: ")
+			if _, err := fmt.Scan(&total); err != nil {
+				log.Println("Invalid input, please try again.")
+				continue
+			}
+		}
+
+		fmt.Print("Enter customer ID: ")
+		fmt.Scan(&customersID)
+
+		fmt.Print("Enter created by user ID: ")
+		fmt.Scan(&createdBy)
+
+		// // Query database disini
+		// product, err := tc.transactionModel.GetProduct(productID)
+		// if err != nil {
+		// 	log.Println("Failed to get product:", err)
+		// 	return
+		// }
+
+		// // Calculate the total by multiplying the price by the quantity
+		// total := product.Price * quantity
+
+		transaction, err := tc.TransactionsModels.CreateTransaction(productID, customersID, createdBy, quantity, total)
 		if err != nil {
-			log.Print(err)
-			return nil //gatau bener apa salah
+			log.Println("Failed to create transaction:", err)
+			return
 		}
-		return nil //kayanya bukan return tpi nanti dipake dibawah
-	case 2:
-		var trInput Transactions
-		var (
-			productName products.Products
-			quantity    int
-		)
-		invoice, err := strconv.Atoi(time.Now().Format("020106"))
-		if err != nil {
-			log.Print("Fail to generate invoice", err.Error())
-		}
-		trInput.Invoice = invoice
-		// input transaction
-		// print all customer by id
 
-		fmt.Println("Enter customer's ID")
-		fmt.Scanln(&trInput.CustomersID)
-
-		var productList []products.Products
-		var choice int
-		for choice > 0 {
-			fmt.Println("Enter product's id")
-			fmt.Scanln(&productName.ID)
-			
-			product, err := products.
-			trInput.Product = append(trInput.Product, productName)
-			fmt.Println("Enter qty")
-			fmt.Scanln(&quantity)
-		}
-	default:
-		fmt.Println("Not valid operation")
-		return nil
+		fmt.Println("---------------------------")
+		fmt.Printf("Transaction created successfully with details:\nInvoice\t\t: %s\nTransdate\t: %s\nProduct ID\t: %d\nCustomer ID\t: %d\nQuantity\t: %d\nTotal\t\t: %d\nCreated by\t: %d\n", transaction.Invoice, transaction.TransDate, transaction.Product, transaction.CustomersID, transaction.Quantity, transaction.Total, transaction.CreatedBy)
+		fmt.Println("---------------------------")
 	}
 }
