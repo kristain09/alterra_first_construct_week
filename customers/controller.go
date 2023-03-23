@@ -3,6 +3,10 @@ package customer
 import (
 	"fmt"
 	"log"
+	"os"
+	"strconv"
+
+	"github.com/olekukonko/tablewriter"
 )
 
 type CustomerController struct {
@@ -29,4 +33,28 @@ func (cc *CustomerController) RegisterCustomer(id int) (int, error) { //id dari 
 	}
 
 	return cust_id, nil
+}
+
+func (cc CustomerController) PrintAllCustomerData(id int) error {
+
+	customer, err := cc.CustomerModels.GetAllCustomerData(id)
+	if err != nil {
+		log.Print(err)
+		return err
+	}
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"ID", "Name", "Created_by"})
+
+	for _, cust := range customer {
+		row := []string{
+			strconv.Itoa(cust.ID),
+			cust.Name,
+			strconv.Itoa(cust.UserID),
+			"-",
+		}
+		table.Append(row)
+	}
+
+	table.Render()
+	return nil
 }

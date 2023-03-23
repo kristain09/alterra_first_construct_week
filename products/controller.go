@@ -56,7 +56,7 @@ func (pc *ProductController) HandleRequest() {
 	}
 }
 
-func (pc *ProductController) handleListProduct() {
+func (pc *ProductController) HandleListProduct() {
 	products, err := pc.productModel.ListProduct("", 0, 0, "", 0)
 	if err != nil {
 		fmt.Println("Failed to retrieve product list:", err)

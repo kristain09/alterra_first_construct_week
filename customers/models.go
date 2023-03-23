@@ -42,3 +42,29 @@ func (cm *CustomerModels) InsertDataToCustomers(newCustomer Customer, id int) (i
 
 	return newCustomer.ID, nil
 }
+
+func (cm CustomerModels) GetAllCustomerData(id int) ([]Customer, error) {
+	rows, err := cm.conn.Query("SELECT * FROM customers")
+	if err != nil {
+		log.Println("Error executing query:", err.Error())
+		return nil, err
+	}
+	defer rows.Close()
+
+	var customers []Customer
+	for rows.Next() {
+		var c Customer
+		if err := rows.Scan(&c.ID, &c.Name, &c.UserID); err != nil {
+			log.Println("Error scanning row:", err.Error())
+			return nil, err
+		}
+		customers = append(customers, c)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Println("Error iterating rows:", err.Error())
+		return nil, err
+	}
+
+	return customers, nil
+}

@@ -15,7 +15,7 @@ import (
 
 type TransactionsController struct {
 	TransactionsModels TransactionsModels
-	TrCustModels       customer.CustomerController
+	TrCustController   *customer.CustomerController
 	TrProdModels       products.ProductModel
 	TrUsersModels      users.UsersModels
 }
@@ -25,7 +25,7 @@ func (tc *TransactionsController) SetConnTcTrModels(tm TransactionsModels) {
 }
 
 func (tc *TransactionsController) SetConnTcCustomer(cc customer.CustomerController) {
-	tc.TrCustModels = cc
+	tc.TrCustController = &cc
 }
 
 func (tc TransactionsController) TransactionHistory() {
@@ -93,11 +93,12 @@ func (tc *TransactionsController) CreateTransaction(id int) error { // id login
 	fmt.Println("2. Existing Customer")
 	fmt.Scanln(&choice)
 
+	var custConn TransactionsController
 	switch choice {
 	case 1:
 		//call RegisterCustomer customer package!
-		var custConn TransactionsController
-		cust_id, err := custConn.TrCustModels.RegisterCustomer(id)
+
+		cust_id, err := custConn.TrCustController.RegisterCustomer(id)
 		if err != nil {
 			log.Print(err)
 			return nil //gatau bener apa salah
@@ -114,19 +115,20 @@ func (tc *TransactionsController) CreateTransaction(id int) error { // id login
 			log.Print("Fail to generate invoice", err.Error())
 		}
 		trInput.Invoice = invoice
-		// input transaction
-		// print all customer by id
 
+		// print all customer by id
+		custConn.TrCustController.PrintAllCustomerData(id)
 		fmt.Println("Enter customer's ID")
 		fmt.Scanln(&trInput.CustomersID)
 
 		var productList []products.Products
-		var choice int
-		for choice > 0 {
-			fmt.Println("Enter product's id")
+		choie := 1
+		for choice != 0 {
+			var list products.ProductController
+			list.HandleListProduct()
+			fmt.Println("Enter product's id\nPress 0 To Exit")
 			fmt.Scanln(&productName.ID)
-			
-			product, err := products.
+
 			trInput.Product = append(trInput.Product, productName)
 			fmt.Println("Enter qty")
 			fmt.Scanln(&quantity)

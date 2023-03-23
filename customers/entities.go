@@ -1,8 +1,7 @@
 package customer
 
 type Customer struct {
-	ID        int
-	Name      string
-	CreatedBy int
-	UserID    int
+	ID     int
+	Name   string
+	UserID int
 }
