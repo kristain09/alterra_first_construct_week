@@ -20,6 +20,16 @@ func readConfig() *appConfig {
 	err := godotenv.Load(".env")
 	result := appConfig{}
 
+	if res == nil {
+		log.Fatal("error connecting to database")
+	}
+
+	return res
+}
+
+func readConfig() *DatabaseConfig {
+	err := godotenv.Load(".env")
+	res := DatabaseConfig{}
 	if err != nil {
 		log.Print("failed to load env files")
 	}

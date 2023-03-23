@@ -1,8 +1,12 @@
 package products
-package users
 
-type Users struct {
-	ID       int
-	UserName string
-	password string
+import "database/sql"
+
+type Products struct {
+	ID         int
+	Name       string
+	Price      int
+	Stock      int
+	Deleted_at sql.NullTime
+	Created_by int
 }
