@@ -45,6 +45,12 @@ func main() {
 				continue
 			}
 
+			fmt.Println("Please enter your username!")
+			fmt.Scan(&username)
+			fmt.Println("Please enter your password!")
+			fmt.Scan(&password)
+			// function login
+			//
 			//
 			//
 			//
@@ -127,14 +133,15 @@ func main() {
 				//
 				//
 				//
-
-		case 9:
-			logIn = false
-		case 99:
-			running = false
-		default:
-			fmt.Println("anda memasukkan input yang salah!")
-			continue
+			case 9:
+				login = false
+			case 99:
+				running = false
+			default:
+				fmt.Println("anda memasukkan input yang salah!")
+				continue
+			}
 		}
 	}
+}
 }
