@@ -26,7 +26,7 @@ func (pc *ProductController) HandleRequest() {
 	for {
 		now := time.Now()
 		fmt.Println(" Product Information\n", now.Format("Monday, 2006 January 2 15:04:05"))
-		pc.handleListProduct() // menggunakan lastest update_at
+		pc.HandleListProduct() // menggunakan lastest update_at
 		fmt.Println("1. Create Product")
 		fmt.Println("2. Update Product Name")
 		fmt.Println("3. Update Product Price")
@@ -57,7 +57,7 @@ func (pc *ProductController) HandleRequest() {
 	}
 }
 
-func (pc *ProductController) handleListProduct() {
+func (pc *ProductController) HandleListProduct() {
 	products, err := pc.productModel.ListProduct("", 0, 0, "", 0)
 	if err != nil {
 		fmt.Println("Failed to retrieve product list:", err)

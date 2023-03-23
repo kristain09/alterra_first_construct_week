@@ -13,4 +13,5 @@ type Transactions struct {
 	CustomersID int
 	CreatedBy   int
 	Product     []products.Products
+	Quantity    int
 }

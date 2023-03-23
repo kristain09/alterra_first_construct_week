@@ -99,6 +99,13 @@ func main() {
 				switch choice2 {
 				case 1:
 					// Product Information functionality
+					cfg := config.InitConfig()
+					connection, _ := config.GetConnection(*cfg)
+					defer connection.Close()
+
+					if connection == nil {
+						log.Fatal("error connection to database")
+					}
 					pm := products.ProductModel{}
 					pm.SetConnection(connection)
 					pc := products.NewProductController(&pm)
