@@ -9,7 +9,7 @@ type Products struct {
 	Name       string
 	Price      int
 	Stock      int
-	Deleted_at sql.NullTime
+	Deleted_at sql.NullString
 	Created_by int
 	Updated_at string
 	Username   string

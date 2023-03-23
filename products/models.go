@@ -19,10 +19,6 @@ func (pm *ProductModel) ListProduct(name string, price int, stock int, updatedAt
 
 	query := "SELECT products.id, products.name, products.price, products.stock, products.created_by, products.deleted_at, DATE_FORMAT(products.updated_at, '%Y-%m-%d %H:%i'), users.id as user_id, users.username FROM products JOIN users ON products.created_by = users.id WHERE products.deleted_at IS NULL ORDER BY products.id, products.updated_at ASC"
 
-	// args := []interface{}{}
-
-	// bisa menerapkan filter var arguments menggunakan interface kosong dengan input dari users.
-
 	rows, err := pm.conn.Query(query)
 	if err != nil {
 		return products, fmt.Errorf("error executing query: %w", err)
@@ -88,7 +84,7 @@ func (pm *ProductModel) UpdateProductNameByID(ID int, createdBy int, name string
 
 	if resultAff <= 0 {
 		log.Println("error while updating product name", err.Error())
-		return Products{}, fmt.Errorf("no rows affected.")
+		return Products{}, fmt.Errorf("no rows affected : %w", err)
 	}
 
 	//fetch satu baris data product yang baru saja diupdate oleh user.
@@ -121,7 +117,7 @@ func (pm *ProductModel) UpdateProductPriceByID(ID int, createdBy int, price int)
 
 	if resultAff <= 0 {
 		log.Println("error while updating product price", err.Error())
-		return Products{}, fmt.Errorf("no rows affected.")
+		return Products{}, fmt.Errorf("no rows affected : %w", err)
 	}
 
 	//fetch satu baris data product yang baru saja diupdate oleh user.
@@ -154,7 +150,7 @@ func (pm *ProductModel) UpdateProductStockByID(ID int, createdBy int, stock int)
 
 	if resultAff <= 0 {
 		log.Println("error while updating product stock", err.Error())
-		return Products{}, fmt.Errorf("no rows affected.")
+		return Products{}, fmt.Errorf("no rows affected : %w", err)
 	}
 
 	//fetch satu baris data product yang baru saja diupdate oleh user.
