@@ -187,3 +187,16 @@ func (pm *ProductModel) RemoveProductByID(ID int) error {
 	}
 	return nil
 }
+
+func (pm *ProductModel) GetProductByID(ID int) (*Products, error) {
+	var product Products
+
+	query := "SELECT id, name, price, stok, updated_at, created_by, username FROM products WHERE id = ? AND deleted_at IS NULL"
+	err := pm.conn.QueryRow(query, ID).Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.Updated_at, &product.Created_by, &product.Username)
+	if err != nil {
+		log.Println("error getting product by id", err.Error())
+		return nil, err
+	}
+
+	return &product, nil
+}
