@@ -14,10 +14,10 @@ func (pm *ProductModel) SetConnection(db *sql.DB) {
 	pm.conn = db
 }
 
-func (pm *ProductModel) ListProduct(name string, price int, stock int, updatedAt string, createdBy int) ([]Products, error) {
+func (pm *ProductModel) ListProduct(name string, price int, stock int, createdBy int) ([]Products, error) {
 	var products []Products
 
-	query := "SELECT products.id, products.name, products.price, products.stock, products.created_by, products.deleted_at, DATE_FORMAT(products.updated_at, '%Y-%m-%d %H:%i'), users.id as user_id, users.username FROM products JOIN users ON products.created_by = users.id WHERE products.deleted_at IS NULL ORDER BY products.id, products.updated_at ASC"
+	query := "SELECT products.id, products.name, products.price, products.stock, products.created_by, users.username FROM products JOIN users ON products.created_by = users.id WHERE products.deleted_at IS NULL ORDER BY products.id"
 
 	rows, err := pm.conn.Query(query)
 	if err != nil {
@@ -27,7 +27,7 @@ func (pm *ProductModel) ListProduct(name string, price int, stock int, updatedAt
 
 	for rows.Next() {
 		var p Products
-		err := rows.Scan(&p.ID, &p.Name, &p.Price, &p.Stock, &p.Created_by, &p.Deleted_at, &p.Updated_at, &p.Created_by, &p.Username)
+		err := rows.Scan(&p.ID, &p.Name, &p.Price, &p.Stock, &p.Created_by, &p.Username)
 		if err != nil {
 			return products, fmt.Errorf("error scanning row: %w", err)
 		}
@@ -42,26 +42,25 @@ func (pm *ProductModel) ListProduct(name string, price int, stock int, updatedAt
 	return products, nil
 }
 
-func (pm *ProductModel) CreateProduct(name string, price int, stock int, createdBy int) (Products, error) {
+func (pm *ProductModel) CreateProduct(name string, price int, stock int, id int) (Products, error) {
 	query := "INSERT INTO products (name, price, stock, created_by) VALUES (?, ?, ?, ?)"
-	result, err := pm.conn.Exec(query, name, price, stock, createdBy)
+	result, err := pm.conn.Exec(query, name, price, stock, id)
 	if err != nil {
 		return Products{}, fmt.Errorf("error creating product: %w", err)
 	}
 
-	id, err := result.LastInsertId()
+	idp, err := result.LastInsertId()
 	if err != nil {
 		return Products{}, fmt.Errorf("error getting product ID: %w", err)
 	}
 
-	// fetch satu baris data product yang baru dibuat user.
-	query = "SELECT id, name, price, stock, created_by, updated_at, deleted_at FROM products WHERE id = ?"
+	query = "SELECT id, name, price, stock, created_by FROM products WHERE id = ?"
 	row := pm.conn.QueryRow(query, id)
 	product := Products{}
-	err = row.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.Created_by, &product.Updated_at, &product.Deleted_at)
+	err = row.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.Created_by)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return Products{}, fmt.Errorf("product with ID %d not found", id)
+			return Products{}, fmt.Errorf("product with ID %d not found", idp)
 		}
 		return Products{}, fmt.Errorf("error getting product details: %w", err)
 	}
@@ -69,7 +68,7 @@ func (pm *ProductModel) CreateProduct(name string, price int, stock int, created
 }
 
 func (pm *ProductModel) UpdateProductNameByID(ID int, createdBy int, name string) (Products, error) {
-	query := "UPDATE products SET name = ?, created_by = ?, updated_at = current_timestamp(3) WHERE id = ?"
+	query := "UPDATE products SET name = ?, created_by = ? WHERE id = ?"
 	result, err := pm.conn.Exec(query, name, createdBy, ID)
 	if err != nil {
 		log.Println("error updating product name", err.Error())
@@ -88,10 +87,10 @@ func (pm *ProductModel) UpdateProductNameByID(ID int, createdBy int, name string
 	}
 
 	//fetch satu baris data product yang baru saja diupdate oleh user.
-	query = "SELECT id, name, price, stock, created_by, updated_at, deleted_at FROM products WHERE id = ?"
+	query = "SELECT id, name, price, stock, created_by, deleted_at FROM products WHERE id = ?"
 	row := pm.conn.QueryRow(query, ID)
 	product := Products{}
-	err = row.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.Created_by, &product.Updated_at, &product.Deleted_at)
+	err = row.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.Created_by, &product.Deleted_at)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return Products{}, fmt.Errorf("product with ID %d not found", ID)
@@ -102,7 +101,7 @@ func (pm *ProductModel) UpdateProductNameByID(ID int, createdBy int, name string
 }
 
 func (pm *ProductModel) UpdateProductPriceByID(ID int, createdBy int, price int) (Products, error) {
-	query := "UPDATE products SET price = ?, created_by = ?, updated_at = current_timestamp(3) WHERE id = ?"
+	query := "UPDATE products SET price = ?, created_by = ?, WHERE id = ?"
 	result, err := pm.conn.Exec(query, price, createdBy, ID)
 	if err != nil {
 		log.Println("error updating product price", err.Error())
@@ -121,10 +120,10 @@ func (pm *ProductModel) UpdateProductPriceByID(ID int, createdBy int, price int)
 	}
 
 	//fetch satu baris data product yang baru saja diupdate oleh user.
-	query = "SELECT id, name, price, stock, created_by, updated_at, deleted_at FROM products WHERE id = ?"
+	query = "SELECT id, name, price, stock, created_by,deleted_at FROM products WHERE id = ?"
 	row := pm.conn.QueryRow(query, ID)
 	product := Products{}
-	err = row.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.Created_by, &product.Updated_at, &product.Deleted_at)
+	err = row.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.Created_by, &product.Deleted_at)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return Products{}, fmt.Errorf("product with ID %d not found", ID)
@@ -135,7 +134,7 @@ func (pm *ProductModel) UpdateProductPriceByID(ID int, createdBy int, price int)
 }
 
 func (pm *ProductModel) UpdateProductStockByID(ID int, createdBy int, stock int) (Products, error) {
-	query := "UPDATE products SET stock = ?, created_by = ?, updated_at = current_timestamp(3) WHERE id = ?"
+	query := "UPDATE products SET stock = ?, created_by = ? WHERE id = ?"
 	result, err := pm.conn.Exec(query, stock, createdBy, ID)
 	if err != nil {
 		log.Println("error updating product stock", err.Error())
@@ -154,10 +153,10 @@ func (pm *ProductModel) UpdateProductStockByID(ID int, createdBy int, stock int)
 	}
 
 	//fetch satu baris data product yang baru saja diupdate oleh user.
-	query = "SELECT id, name, price, stock, created_by, updated_at, deleted_at FROM products WHERE id = ?"
+	query = "SELECT id, name, price, stock, created_by, deleted_at FROM products WHERE id = ?"
 	row := pm.conn.QueryRow(query, ID)
 	product := Products{}
-	err = row.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.Created_by, &product.Updated_at, &product.Deleted_at)
+	err = row.Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.Created_by, &product.Deleted_at)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return Products{}, fmt.Errorf("product with ID %d not found", ID)
@@ -191,8 +190,8 @@ func (pm *ProductModel) RemoveProductByID(ID int) error {
 func (pm *ProductModel) GetProductByID(ID int) (*Products, error) {
 	var product Products
 
-	query := "SELECT id, name, price, stok, updated_at, created_by, username FROM products WHERE id = ? AND deleted_at IS NULL"
-	err := pm.conn.QueryRow(query, ID).Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.Updated_at, &product.Created_by, &product.Username)
+	query := "SELECT id, name, price, stock, created_by FROM products WHERE id = ? AND deleted_at IS NULL"
+	err := pm.conn.QueryRow(query, ID).Scan(&product.ID, &product.Name, &product.Price, &product.Stock, &product.Created_by)
 	if err != nil {
 		log.Println("error getting product by id", err.Error())
 		return nil, err

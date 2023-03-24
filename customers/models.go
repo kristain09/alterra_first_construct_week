@@ -15,7 +15,7 @@ func (cm *CustomerModels) SetConnDBCustModels(db *sql.DB) {
 
 func (cm *CustomerModels) InsertDataToCustomers(newCustomer Customer, id int) (int, error) { //jgn lupa if kembalian 0
 
-	result, err := cm.conn.Exec("Insert into customers (name, user_id) values (?)", newCustomer.Name, id)
+	result, err := cm.conn.Exec("Insert into customers (name, users_id) values (?, ?)", newCustomer.Name, id)
 
 	if err != nil {
 		log.Println("Error executing", err.Error())

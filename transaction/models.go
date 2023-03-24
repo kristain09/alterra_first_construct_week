@@ -76,12 +76,13 @@ func (tm *TransactionsModels) InitDeletedAt(id int) error {
 }
 
 func (tm TransactionsModels) InsertTransaction(input Transactions, userID int) (int, error) {
-	tx, err := tm.db.Begin()
+	tx, err := tm.conn.Begin()
 	if err != nil {
 		log.Println(err)
 		return 0, err
 	}
 	stmt, err := tx.Prepare("INSERT INTO transactions(invoice, transdate, total, customers_id, created_by) VALUES(?,?,?,?,?)")
+
 	if err != nil {
 		log.Println(err)
 		return 0, err
@@ -101,7 +102,7 @@ func (tm TransactionsModels) InsertTransaction(input Transactions, userID int) (
 		return 0, err
 	}
 
-	stmt2, err := tx.Prepare("INSERT INTO transaction_product(transaction_id, product_id, qty) VALUES (?,?,?)")
+	stmt2, err := tx.Prepare("INSERT INTO products_has_transactions(transactions_id, products_id, qty) VALUES (?,?,?)")
 	if err != nil {
 		log.Println(err)
 		tx.Rollback()

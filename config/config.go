@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -14,6 +15,7 @@ type appConfig struct {
 	DBName     string
 	DBUserName string
 	dbPassword string
+	DBArgs     time.Time
 }
 
 func readConfig() *appConfig {

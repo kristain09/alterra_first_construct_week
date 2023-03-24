@@ -7,6 +7,7 @@ import (
 	"first_construct_week/users"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"strconv"
 	"time"
@@ -16,7 +17,7 @@ import (
 
 type TransactionsController struct {
 	TransactionsModels TransactionsModels
-	TrCustController   *customer.CustomerController
+	TrCustController   customer.CustomerController
 	TrProdModels       products.ProductModel
 	TrUsersModels      users.UsersModels
 }
@@ -26,7 +27,7 @@ func (tc *TransactionsController) SetConnTcTrModels(tm TransactionsModels) {
 }
 
 func (tc *TransactionsController) SetConnTcCustomer(cc customer.CustomerController) {
-	tc.TrCustController = &cc
+	tc.TrCustController = cc
 }
 
 func (tc TransactionsController) TransactionHistory() {
@@ -43,7 +44,7 @@ func (tc TransactionsController) TransactionHistory() {
 		row := []string{
 			strconv.Itoa(transaction.ID),
 			strconv.Itoa(transaction.Invoice),
-			transaction.TransDate.Format("2006-01-02 15:04:05"),
+			transaction.TransDate,
 			fmt.Sprintf("%d", transaction.Total),
 			strconv.Itoa(transaction.CustomersID),
 			strconv.Itoa(transaction.CreatedBy),
@@ -68,7 +69,7 @@ func (tc TransactionsController) TransactionHistoryByID(id int) error {
 		row := []string{
 			strconv.Itoa(transaction.ID),
 			strconv.Itoa(transaction.Invoice),
-			transaction.TransDate.Format("2006-01-02 15:04:05"),
+			transaction.TransDate,
 			fmt.Sprintf("%d", transaction.Total),
 			strconv.Itoa(transaction.CustomersID),
 			strconv.Itoa(transaction.CreatedBy),
@@ -81,11 +82,19 @@ func (tc TransactionsController) TransactionHistoryByID(id int) error {
 	return nil
 }
 
-func (tc TransactionsController) DeleteTransaction() {
+func (tc TransactionsController) DeleteTransaction() error {
 	var id int
+	var err error
 	fmt.Println("Please enter transaction id!")
-	fmt.Scanln(&id)
-	tc.TransactionsModels.InitDeletedAt(id)
+	_, err = fmt.Scanln(&id)
+	if err != nil {
+		return err
+	}
+	err = tc.TransactionsModels.InitDeletedAt(id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (tc *TransactionsController) CreateTransaction(id int) error { // id login
@@ -108,7 +117,9 @@ func (tc *TransactionsController) CreateTransaction(id int) error { // id login
 			productName products.Products
 			quantity    int
 		)
-		invoice, err := strconv.Atoi(time.Now().Format("020106"))
+		timeSeed := time.Now().UnixNano()
+		rand.Seed(timeSeed)
+		invoice := rand.Intn(10000000)
 		if err != nil {
 			log.Print("Fail to generate invoice", err.Error())
 		}
@@ -118,8 +129,13 @@ func (tc *TransactionsController) CreateTransaction(id int) error { // id login
 		var productList []products.Products
 		choice := 1
 		for choice != 0 {
-			var list products.ProductController
-			list.HandleListProduct()
+			productList, err = tc.TrProdModels.ListProduct("", 0, 0, 0)
+			if err != nil {
+				return err
+			}
+			for _, p := range productList {
+				fmt.Println(fmt.Sprint(p.ID), p.Name, fmt.Sprintf("%d", p.Price), fmt.Sprintf("%d", p.Stock), p.Username)
+			}
 			fmt.Println("Enter product's id\nPress 0 To Exit")
 			fmt.Scanln(&productName.ID)
 			if productName.ID == 0 {
@@ -138,14 +154,12 @@ func (tc *TransactionsController) CreateTransaction(id int) error { // id login
 				fmt.Println("Not Enough Stock")
 				continue
 			}
-
 			productList = append(productList, products.Products{
 				ID:         product.ID,
 				Name:       product.Name,
 				Price:      product.Price,
 				Stock:      quantity,
 				Created_by: product.Created_by,
-				Updated_at: product.Updated_at,
 				Username:   product.Username,
 			})
 		}
@@ -179,8 +193,13 @@ func (tc *TransactionsController) CreateTransaction(id int) error { // id login
 		var productList []products.Products
 		choice := 1
 		for choice != 0 {
-			var list products.ProductController
-			list.HandleListProduct()
+			productList, err = tc.TrProdModels.ListProduct("", 0, 0, 0)
+			if err != nil {
+				return err
+			}
+			for _, p := range productList {
+				fmt.Println(fmt.Sprint(p.ID), p.Name, fmt.Sprintf("%d", p.Price), fmt.Sprintf("%d", p.Stock), p.Username)
+			}
 			fmt.Println("Enter product's id\nPress 0 To Exit")
 			fmt.Scanln(&productName.ID)
 			if productName.ID == 0 {
@@ -199,14 +218,12 @@ func (tc *TransactionsController) CreateTransaction(id int) error { // id login
 				fmt.Println("Not Enough Stock")
 				continue
 			}
-
 			productList = append(productList, products.Products{
 				ID:         product.ID,
 				Name:       product.Name,
 				Price:      product.Price,
 				Stock:      quantity,
 				Created_by: product.Created_by,
-				Updated_at: product.Updated_at,
 				Username:   product.Username,
 			})
 		}
@@ -219,7 +236,6 @@ func (tc *TransactionsController) CreateTransaction(id int) error { // id login
 		}
 		fmt.Println("Transaction Successfully Created")
 		return nil
-
 	default:
 		return errors.New("invalid choice, please enter valid choice")
 	}

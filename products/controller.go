@@ -3,6 +3,7 @@ package products
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -19,11 +20,11 @@ func NewProductController(pm *ProductModel) *ProductController {
 	return &ProductController{pm}
 }
 
-func (pc *ProductController) HandleRequest() {
+func (pc *ProductController) HandleRequest(id int) error {
 
 	var choice int
 
-	for {
+	for choice != 9 {
 		now := time.Now()
 		fmt.Println(" Product Information\n", now.Format("Monday, 2006 January 2 15:04:05"))
 		pc.HandleListProduct() // menggunakan lastest update_at
@@ -38,50 +39,67 @@ func (pc *ProductController) HandleRequest() {
 
 		switch choice {
 		case 1:
-			pc.handleCreateProduct()
+			err := pc.handleCreateProduct(id)
+			if err != nil {
+				log.Fatal(err)
+			}
 		case 2:
-			pc.handleUpdateProductNameByID()
+			err := pc.handleUpdateProductNameByID()
+			if err != nil {
+				log.Fatal(err)
+			}
 		case 3:
-			pc.handleUpdateProductPriceByID()
+			err := pc.handleUpdateProductPriceByID()
+			if err != nil {
+				log.Fatal(err)
+			}
 		case 4:
-			pc.handleUpdateProductStockByID()
+			err := pc.handleUpdateProductStockByID()
+			if err != nil {
+				log.Fatal(err)
+			}
 		case 5:
-			pc.handleRemoveProductByID()
+			err := pc.handleRemoveProductByID()
+			if err != nil {
+				log.Fatal(err)
+			}
 		case 9:
 			fmt.Println("Exiting program...")
-			return
+			os.Exit(0)
 		default:
 			fmt.Println("Invalid choice")
 			continue
 		}
 	}
+	return nil
 }
 
-func (pc *ProductController) HandleListProduct() {
-	products, err := pc.productModel.ListProduct("", 0, 0, "", 0)
+func (pc *ProductController) HandleListProduct() error {
+	products, err := pc.productModel.ListProduct("", 0, 0, 0)
 	if err != nil {
 		fmt.Println("Failed to retrieve product list:", err)
-		return
+		return err
 	}
 
 	if len(products) == 0 {
 		fmt.Println("No products found")
-		return
+		return err
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"ID", "Name", "Price", "Stock", "Username", "Latest Update"})
+	table.SetHeader([]string{"ID", "Name", "Price", "Stock", "Username"})
 
 	for _, p := range products {
-		table.Append([]string{fmt.Sprint(p.ID), p.Name, fmt.Sprintf("%d", p.Price), fmt.Sprintf("%d", p.Stock), p.Username, p.Updated_at})
+		table.Append([]string{fmt.Sprint(p.ID), p.Name, fmt.Sprintf("%d", p.Price), fmt.Sprintf("%d", p.Stock), p.Username})
 	}
 
 	table.Render()
+	return nil
 }
 
-func (pc *ProductController) handleCreateProduct() {
+func (pc *ProductController) handleCreateProduct(id int) error {
 	var name string
-	var price, stock, createdBy int
+	var price, stock int
 
 	fmt.Println("---------------------------")
 	fmt.Println("Create Product")
@@ -105,21 +123,18 @@ func (pc *ProductController) handleCreateProduct() {
 	fmt.Print("Enter product stock: ")
 	fmt.Scan(&stock)
 
-	fmt.Print("Enter created by user ID: ")
-	fmt.Scan(&createdBy)
-
-	product, err := pc.productModel.CreateProduct(name, price, stock, createdBy)
+	product, err := pc.productModel.CreateProduct(name, price, stock, id)
 	if err != nil {
-		fmt.Println("Failed to create product:", err)
-		return
+		return err
 	}
 
 	fmt.Println("---------------------------")
-	fmt.Printf("Product created successfully with details:\nID\t: %d\nName\t: %s\nPrice\t: %d\nStock\t: %d\nCreated by\t: %d\nUpdated at\t: %s\n", product.ID, product.Name, product.Price, product.Stock, product.Created_by, product.Updated_at)
+	fmt.Printf("Product created successfully with details:\nID\t: %d\nName\t: %s\nPrice\t: %d\nStock\t: %d\nCreated by\t: %d", product.ID, product.Name, product.Price, product.Stock, id)
 	fmt.Println("---------------------------")
+	return nil
 }
 
-func (pc *ProductController) handleUpdateProductNameByID() {
+func (pc *ProductController) handleUpdateProductNameByID() error {
 	var name string
 	var createdBy int
 
@@ -149,15 +164,16 @@ func (pc *ProductController) handleUpdateProductNameByID() {
 	product, err := pc.productModel.UpdateProductNameByID(ID, createdBy, name)
 	if err != nil {
 		fmt.Println("Failed to update product name:", err)
-		return
+		return err
 	}
 
 	fmt.Println("---------------------------")
-	fmt.Printf("Product updated successfully with details:\nID\t: %d\nName\t: %s\nPrice\t: %d\nStock\t: %d\nCreated by\t: %d\nUpdated at\t: %s\n", product.ID, product.Name, product.Price, product.Stock, product.Created_by, product.Updated_at)
+	fmt.Printf("Product updated successfully with details:\nID\t: %d\nName\t: %s\nPrice\t: %d\nStock\t: %d\nCreated by\t: %d\n", product.ID, product.Name, product.Price, product.Stock, product.Created_by)
 	fmt.Println("---------------------------")
+	return nil
 }
 
-func (pc *ProductController) handleUpdateProductPriceByID() {
+func (pc *ProductController) handleUpdateProductPriceByID() error {
 	var price int
 	var createdBy int
 
@@ -192,15 +208,16 @@ func (pc *ProductController) handleUpdateProductPriceByID() {
 	product, err := pc.productModel.UpdateProductPriceByID(ID, createdBy, price)
 	if err != nil {
 		fmt.Println("Failed to update product price:", err)
-		return
+		return err
 	}
 
 	fmt.Println("---------------------------")
-	fmt.Printf("Product updated successfully with details:\nID\t: %d\nName\t: %s\nPrice\t: %d\nStock\t: %d\nCreated by\t: %d\nUpdated at\t: %s\n", product.ID, product.Name, product.Price, product.Stock, product.Created_by, product.Updated_at)
+	fmt.Printf("Product updated successfully with details:\nID\t: %d\nName\t: %s\nPrice\t: %d\nStock\t: %d\nCreated by\t: %d\n", product.ID, product.Name, product.Price, product.Stock, product.Created_by)
 	fmt.Println("---------------------------")
+	return nil
 }
 
-func (pc *ProductController) handleUpdateProductStockByID() {
+func (pc *ProductController) handleUpdateProductStockByID() error {
 	var stock int
 	var createdBy int
 
@@ -235,15 +252,16 @@ func (pc *ProductController) handleUpdateProductStockByID() {
 	product, err := pc.productModel.UpdateProductPriceByID(ID, createdBy, stock)
 	if err != nil {
 		fmt.Println("Failed to update product price:", err)
-		return
+		return err
 	}
 
 	fmt.Println("---------------------------")
-	fmt.Printf("Product updated successfully with details:\nID\t: %d\nName\t: %s\nPrice\t: %d\nStock\t: %d\nCreated by\t: %d\nUpdated at\t: %s\n", product.ID, product.Name, product.Price, product.Stock, product.Created_by, product.Updated_at)
+	fmt.Printf("Product updated successfully with details:\nID\t: %d\nName\t: %s\nPrice\t: %d\nStock\t: %d\nCreated by\t: %d\n", product.ID, product.Name, product.Price, product.Stock, product.Created_by)
 	fmt.Println("---------------------------")
+	return nil
 }
 
-func (pc *ProductController) handleRemoveProductByID() {
+func (pc *ProductController) handleRemoveProductByID() error {
 	fmt.Println("---------------------------")
 	fmt.Println("Remove Product ID")
 	fmt.Println("---------------------------")
@@ -252,10 +270,10 @@ func (pc *ProductController) handleRemoveProductByID() {
 	productIDs := make(map[int]bool)
 
 	// memproses map untuk nampung IDs yang sudah ada, jika ada maka true dan sebalikanya.
-	products, err := pc.productModel.ListProduct("", 0, 0, "", 0)
+	products, err := pc.productModel.ListProduct("", 0, 0, 0)
 	if err != nil {
 		fmt.Println("failed to retrieve products:", err)
-		return
+		return err
 	}
 	for _, product := range products {
 		productIDs[product.ID] = true
@@ -279,4 +297,5 @@ func (pc *ProductController) handleRemoveProductByID() {
 		}
 		break
 	}
+	return nil
 }

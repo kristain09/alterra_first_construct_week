@@ -2,7 +2,9 @@ package main
 
 import (
 	"first_construct_week/config"
+	customer "first_construct_week/customers"
 	"first_construct_week/products"
+	"first_construct_week/transaction"
 	"first_construct_week/users"
 	"fmt"
 	"log"
@@ -17,6 +19,10 @@ func main() {
 		uc      users.UsersController
 		auth    users.Users
 		pm      products.ProductModel
+		tc      transaction.TransactionsController
+		tm      transaction.TransactionsModels
+		cc      customer.CustomerController
+		cm      customer.CustomerModels
 	)
 
 	cfg := config.InitConfig()
@@ -27,10 +33,18 @@ func main() {
 		log.Fatal("error connection to database")
 	}
 
+	//membuat koneksi antar controller dan models
 	um.SetConnUsersModels(connection)
 	pm.SetConnection(connection)
 	uc.SetConnectModels(um)
 	pc := products.NewProductController(&pm)
+	tm.SetConnDBTransModels(connection)
+	tc.SetConnTcTrModels(tm)
+	cm.SetConnDBCustModels(connection)
+	cc.SetConnCcCustModels(cm)
+	tc.TrCustController = cc
+	tc.TrProdModels = pm
+	tc.TrUsersModels = um
 
 	for running {
 		fmt.Println("Welcome to our project!")
@@ -58,29 +72,24 @@ func main() {
 
 		if auth.UserName == "admin" {
 			for LoggedIn {
-				menu := "1. Product Information\n2. Transaction Input\n3. Update Transaction\n4. Delete Transaction\n5. All Transaction History\n6. Register Cashier\n7. Delete Cashier\n9. Logout\n99. Exit\n"
+				menu := "1. Product Information\n2. Transaction Input\n3. Delete Transaction\n5. All Transaction History\n6.AllTransaction By Cashier\n7. Register Cashier\n8. Delete Cashier\n9. Logout\n99. Exit\n"
 				fmt.Println(menu)
 				fmt.Scanln(&choice2)
 				switch choice2 {
 				case 1:
-					// Product Information functionality
-					pc.HandleRequest()
+					pc.HandleRequest(auth.ID) //done
 				case 2:
-					//  Transaction Input functionality
+					tc.CreateTransaction(auth.ID) //done
 				case 3:
-					// Update Transaction History functionality
-				case 4:
-					// template m c//Delete Transaction functionality
+					tc.DeleteTransaction()
 				case 5:
-					// template m c// All Transaction History functionality
+					tc.TransactionHistory()
 				case 6:
-					// template m c// Transaction By ID
+					tc.TransactionHistoryByID(auth.ID)
 				case 7:
-					//done // Register Cashier functionality
-					uc.Register()
+					uc.Register() //done
 				case 8:
-					//done // Delete Cashier functionality
-					uc.DeleteUser()
+					uc.DeleteUser() //done
 				case 9:
 					LoggedIn = false
 				case 99:
@@ -97,12 +106,11 @@ func main() {
 				fmt.Scanln(&choice2)
 				switch choice2 {
 				case 1:
-					// Product Information functionality
-					pc.HandleRequest()
+					pc.HandleRequest(auth.ID)
 				case 2:
-					// Transaction Input functionality
+					tc.CreateTransaction(auth.ID)
 				case 3:
-					// template m c// Transaction History functionality
+					tc.TransactionHistoryByID(auth.ID)
 				case 9:
 					LoggedIn = false
 				case 99:
