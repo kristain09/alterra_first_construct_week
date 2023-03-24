@@ -1,17 +1,14 @@
 package transactions
 
-import (
-	"first_construct_week/products"
-	"time"
-)
+import "database/sql"
 
 type Transactions struct {
 	ID          int
-	Invoice     int
-	TransDate   time.Time
+	Invoice     sql.NullString
+	TransDate   string
 	Total       int
 	CustomersID int
 	CreatedBy   int
-	Product     []products.Products
+	Product     int
 	Quantity    int
 }
